@@ -1,0 +1,33 @@
+{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "../../opt/odin-v2026-08"
+        }
+    ],
+    "settings": {},
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "sample - build",
+                "type": "shell",
+                "command": "./build_sample.sh",
+                "options": {
+                    "cwd": "./sample"
+                },
+                "presentation": {
+                    // "reveal": "always",
+                    "revealProblems": "onProblem",
+                    "clear": true,
+                },
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                }
+            }
+        ]
+    }
+}

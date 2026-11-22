@@ -5,12 +5,12 @@ import "core:dynlib"
 import "core:os"
 import rl "vendor:raylib"
 
-DL_Init_Proc :: #type proc "c" ()
+DL_Alloc_Proc :: #type proc "c" ()
 DL_Pre_Reload_Proc :: #type proc "c" () -> rawptr
 DL_Post_Reload_Proc :: #type proc "c" (state: rawptr)
 DL_Update_Proc :: #type proc "c" (dt: f32)
 DL_Symbols :: struct {
-    init: DL_Init_Proc,
+    alloc: DL_Alloc_Proc,
     pre_reload: DL_Pre_Reload_Proc,
     post_reload: DL_Post_Reload_Proc,
     update: DL_Update_Proc,
@@ -31,7 +31,7 @@ dl_reload :: proc(symbols: ^DL_Symbols, dl_path: string) -> bool {
         symbols^ = syms
     } else {
         fmt.eprintln("[WARN] Failed to reload dll")
-        fmt.eprintfln("[DEBUG] count = %v, ok = %v")
+        fmt.eprintfln("[DEBUG] count = %v, ok = %v", count, ok)
     }
     return ok
 }
@@ -57,11 +57,13 @@ main :: proc() {
     rl.SetExitKey(.Q)
     rl.SetTargetFPS(60)
 
-    sym.init()
+    sym.alloc()
+    state := sym.pre_reload()
+    sym.post_reload(state)
     paused := false
     SW :: rl.GetScreenWidth
 
-    t_mult := 1
+    t_mult := int(1)
     for !rl.WindowShouldClose() {
         if rl.IsKeyPressed(.R) {
             state := sym.pre_reload()
@@ -81,15 +83,16 @@ main :: proc() {
 
         {
             dt := 0.0 if paused else rl.GetFrameTime() * f32(t_mult)
-            sym.update(dt)
-
             rl.BeginDrawing()
             defer rl.EndDrawing()
+            sym.update(dt)
+
             if paused {
                 rl.DrawRectangle(SW() - 65, 25, 10, 35, rl.WHITE)
                 rl.DrawRectangle(SW() - 42, 25, 10, 35, rl.WHITE)
             }
-            if t_mult != 0.0 {
+            if t_mult != 1 {
+                assert(t_mult != 0, "t_mult should not be zero.")
                 text := rl.TextFormat("%dx", t_mult)
                 if t_mult < 0 {
                     text = rl.TextFormat("1/%dx", -t_mult)

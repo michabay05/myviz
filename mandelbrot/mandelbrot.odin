@@ -24,15 +24,15 @@ State :: struct {
 state: ^State
 
 @(export)
-init :: proc "c" (dt: f32) {
+alloc :: proc "c" (dt: f32) {
     context = runtime.default_context()
     state = new(State)
-    state.shader = rl.LoadShader(nil, FRAG_PATH)
 }
 
 @(export)
 post_reload :: proc "c" (s: rawptr) {
     state = cast(^State)s
+    state.shader = rl.LoadShader(nil, FRAG_PATH)
 }
 
 @(export)
