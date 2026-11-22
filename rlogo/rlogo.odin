@@ -1,8 +1,8 @@
 package rlogo
 
-import "core:math"
 import "base:runtime"
 import rl "vendor:raylib"
+import "../utils"
 
 Vec2 :: rl.Vector2
 Vec3 :: rl.Vector3
@@ -14,23 +14,8 @@ SH :: proc(factor: f32 = 1.0) -> f32 {
     return f32(rl.GetScreenHeight()) * factor
 }
 
-Anim_Func :: proc(t: f32)
-Anim :: struct {
-    func: Anim_Func,
-    duration: int,
-    start_frame: int,
-}
-anim :: proc(func: Anim_Func, duration, start_frame: int) -> Anim {
-    return {
-        func = func,
-        duration = duration,
-        start_frame = start_frame
-    }
-}
-
 State :: struct {
-    anims: [dynamic]Anim,
-    index: int,
+    anims: utils.Anims,
     frames: int,
 }
 
@@ -46,22 +31,15 @@ alloc :: proc "c" (dt: f32) {
 post_reload :: proc "c" (s: rawptr) {
     state = cast(^State)s
     context = runtime.default_context()
-    state^ = {
-        anims = make([dynamic]Anim),
-        index = 0
-    }
-    append(&state.anims,
-        anim(blinking_dot, 60*3, 0),
-        anim(line_extend_left_down, 60, 0),
-        anim(line_extend_right_up, 60, 0),
+    // Reset state
+    clear(&state.anims.items)
+    utils.anims_init(&state.anims,
+        utils.anim(blinking_dot, 60*3),
+        utils.anim(line_extend_left_down, 60),
+        utils.anim(line_extend_right_up, 60),
     )
-
-    // Compute the start frame index
-    total := int(0)
-    for &anim in state.anims {
-        anim.start_frame = total
-        total += anim.duration
-    }
+    state.anims.index = 0
+    state.frames = 0
 }
 
 @(export)
@@ -74,18 +52,7 @@ update :: proc "c" (dt: f32) {
     context = runtime.default_context()
     rl.ClearBackground(rl.RAYWHITE)
 
-    if state.index >= len(state.anims) {
-        state.anims[len(state.anims)-1].func(1.0)
-        rl.DrawText("Done!", 10, i32(SH()-30), 20, rl.WHITE)
-        return
-    }
-
-    anim := &state.anims[state.index]
-    t := f32(state.frames - anim.start_frame) / f32(anim.duration)
-    if 0 <= t && t <= 1 {
-        anim.func(t)
-        if t == 1.0 do state.index += 1
-    }
+    utils.anims_update(&state.anims, state.frames)
     state.frames += 1
 }
 
@@ -98,7 +65,7 @@ update :: proc "c" (dt: f32) {
 */
 
 blinking_dot :: proc(t: f32) {
-    half_period := f32(0.2)
+    half_period := f32(0.1)
     color := rl.BLACK if int(t/half_period)%2 == 0 else rl.BLANK
     rl.DrawRectangle(100, 100, 35, 35, color)
 }
