@@ -1,32 +1,6 @@
 # myviz
 
-This project is my attempt at replacing what processing (the java version) can do for me.
-Processing, as of right now, is great at providing a wide array of basic primitives such
-that I can just start visualizing whatever I find interesting at the moment. Everything
-from manipulating the individual pixels to drawing primitive shapes to loading custom
-shaders is a such a trivial thing to do in processing. However, I don't really like the
-surrounding 'architecture', so to speak. The need to depend on Java appears like more of a
-historical constraint for processing. I believe that one could achieve feature parity (or
-even better) without having to rely on Java. The main benefit of using Java, in my eyes,
-is the fact that it allows for static type checking, which eliminates the
-"you-will-find-out-if-your-script-works-at-runtime" style of iterating on a given
-visualization.
-
-For me, the benefit I get from using something like Processing is the fact that I can
-explore interesting geometric or fractal visualizations in a rather simple, expressive
-manner. While that is true, Processing's dependency on Java is a rather critical issue for
-me. Trying to run my processing scripts through its CLI is rather unbearable. So, the
-question is: "Can I replicate the benefits of Processing without having to depend on
-something like Java?" (Answer should be obvious, given the existence of this project)
-
-**Objective**: Develop a simple CLI program that can process a 2D visualization script and
-immediately start visualizing it. Below are some requirements to consider this project a
-success (in order of importance):
-- Statically typed scripting language
-- Minimal startup time (as close to instant as possible)
-- Comprehensive set of primitives and animations
-- Extensible system (hopefully without an OOP-like system)
-- Runtime REPL
+Prelude moved to [README](./README.md)
 
 ## Builtin types
 Some types naturally arise during visualizations; thus, those have to also be accounted
