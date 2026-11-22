@@ -40,7 +40,7 @@ anims_init :: proc(a: ^Anims, args: ..Anim) {
 
 anims_update :: proc(a: ^Anims, frames: int) {
     if a.index >= len(a.items) {
-        a.items[len(a.items)-1].func(1.0)
+        if len(a.items) != 0 do a.items[len(a.items)-1].func(1.0)
         return
     }
 
