@@ -32,7 +32,7 @@ success (in order of importance):
 > [!NOTE]
 > The ideas listed in `OLD_DOC.md` are features I want to have implemented in my
 > visualizer; however, the ideas there were written to serve as a guide for me as I tried
-> to implement a domain-specific scripting language for this visualizer, which I am no
+> to implement a domain-specific scripting language for this visualizer, a vision I am no
 > longer pursuing.
 
 ## Quickstart
