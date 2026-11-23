@@ -51,3 +51,10 @@ anims_update :: proc(a: ^Anims, frames: int) {
         if t == 1.0 do a.index += 1
     }
 }
+
+anims_duration :: proc(a: Anims) -> int {
+    if len(a.items) > 0 {
+        last := a.items[len(a.items)-1]
+        return last.start_frame + last.duration
+    } else do return 0
+}

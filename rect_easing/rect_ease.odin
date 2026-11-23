@@ -24,7 +24,7 @@ State :: struct {
 state: ^State
 
 @(export)
-alloc :: proc "c" (dt: f32) {
+alloc :: proc "c" () {
     context = runtime.default_context()
     state = new(State)
 }
@@ -34,7 +34,7 @@ post_reload :: proc "c" (s: rawptr) {
     state = cast(^State)s
     context = runtime.default_context()
     // Reset state
-    clear(&state.anims.items)
+    state.anims = utils.Anims{}
     utils.anims_init(&state.anims,
         utils.anim(rotating_rects, 60*10)
     )
@@ -50,8 +50,8 @@ post_reload :: proc "c" (s: rawptr) {
 }
 
 @(export)
-pre_reload :: proc "c" () -> rawptr {
-    return state
+pre_reload :: proc "c" () -> (rawptr, utils.Anims) {
+    return state, state.anims
 }
 
 CELL_SZ :: 50
