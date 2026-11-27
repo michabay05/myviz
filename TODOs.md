@@ -8,8 +8,6 @@ TODOs:
 - [ ] (fix) Change vizmain's keymap domain
     - It should not take up common keymaps; it should map things like the function keys,
       ctrl+<SOME_OTHER_KEY>, etc.
-- [ ] (fix) Remove plug update's knowledge of the frame dt
-    - It should operate based on frame indices
 - [ ] (feat) Make DLL selectable on startup (if cmd args are not specified)
     - This would imply that the cmd args pertaining to DLL path is optional.
 - [ ] (feat) Implement a non-trivial 3D visualization (I don't really know what, for now)
@@ -22,12 +20,15 @@ TODOs:
     - Params include (but are not limited to) video dimensions, fps, etc.
     - One mechanims is to make the user return a `Video_Config` structure containing all
       relevant info about the target video on the setup function.
-- [ ] (feat) Add a 2D camera animation to the `rect_ease` anim
-    - [ ] Translation
-    - [ ] Rotation
-    - [ ] Zoom
+
 
 v0.1:
+- [x] (feat) Add a 2D camera animation to the `rect_ease` anim
+    - [x] Translation
+    - [x] Rotation
+    - [x] Zoom
+- [x] (fix) Remove plug update's knowledge of the frame dt
+    - It should operate based on frame indices (independent of the frame rate)
 - [x] (feat) Add FFMPEG rendering
     - [x] Save info logged by ffmpeg into `stdout` and `stderr` instead of ignoring
 - [x] (feat) Implement raylib's "easing rectangles" anim

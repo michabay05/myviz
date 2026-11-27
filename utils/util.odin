@@ -5,14 +5,14 @@ Anim_Func :: proc(t: f32)
 Anim :: struct {
     func: Anim_Func,
     duration: int,
-    start_frame: int,
+    start: int,
 }
 
-anim :: proc(func: Anim_Func, duration: int, start_frame := -1) -> Anim {
+anim :: proc(func: Anim_Func, duration: int, start := -1) -> Anim {
     return {
         func = func,
         duration = duration,
-        start_frame = start_frame
+        start = start
     }
 }
 
@@ -33,7 +33,7 @@ anims_init :: proc(a: ^Anims, args: ..Anim) {
     // Compute the start frame index
     total := int(0)
     for &anim in a.items {
-        anim.start_frame = total
+        anim.start = total
         total += anim.duration
     }
 }
@@ -45,7 +45,7 @@ anims_update :: proc(a: ^Anims, frames: int) {
     }
 
     anim := &a.items[a.index]
-    t := f32(frames - anim.start_frame) / f32(anim.duration)
+    t := f32(frames - anim.start) / f32(anim.duration)
     if 0 <= t && t <= 1 {
         anim.func(t)
         if t == 1.0 do a.index += 1
@@ -55,6 +55,6 @@ anims_update :: proc(a: ^Anims, frames: int) {
 anims_duration :: proc(a: Anims) -> int {
     if len(a.items) > 0 {
         last := a.items[len(a.items)-1]
-        return last.start_frame + last.duration
+        return last.start + last.duration
     } else do return 0
 }

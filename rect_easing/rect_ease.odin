@@ -1,6 +1,7 @@
 package rlogo
 
 import "core:math/ease"
+import "core:math/linalg"
 import "base:runtime"
 import rl "vendor:raylib"
 import "../utils"
@@ -34,7 +35,6 @@ post_reload :: proc "c" (s: rawptr) {
     state = cast(^State)s
     context = runtime.default_context()
     // Reset state
-    state.anims = utils.Anims{}
     utils.anims_init(&state.anims,
         utils.anim(rotating_rects, 60*10)
     )
@@ -58,7 +58,7 @@ CELL_SZ :: 50
 CELL_FILL_RATIO :: f32(0.625)
 
 @(export)
-update :: proc "c" (dt: f32) {
+update :: proc "c" () {
     context = runtime.default_context()
     rl.ClearBackground(rl.GetColor(0x151515FF))
 
@@ -67,21 +67,28 @@ update :: proc "c" (dt: f32) {
 }
 
 rotating_rects :: proc(t: f32) {
-    rl.BeginMode2D(state.camera)
-    defer rl.EndMode2D()
-    rows, cols := int(SH()) / CELL_SZ, int(SW()) / CELL_SZ
-
     t := t
     if t < 0.5 {
         t = rl.Remap(t, 0, 0.5, 1, 0)
+        state.camera.target = linalg.lerp(Vec2{100, 100}, Vec2{-100, -100}, t)
+        state.camera.zoom = linalg.lerp(f32(5), f32(1), t)
     } else {
         t = rl.Remap(t, 0.5, 1, 0, 1)
     }
     t = ease.ease(.Circular_In_Out, t)
 
-    rotation := t * 360.
+
+    rl.BeginMode2D(state.camera)
+    defer rl.EndMode2D()
+    rows, cols := int(SH()) / CELL_SZ, int(SW()) / CELL_SZ
+
+    render_grid(0.6, rows, cols)
+}
+
+render_grid :: proc(factor: f32, rows, cols: int) {
+    rotation := factor * 360.
     color := rl.ColorAlpha(rl.RED, 0.5)
-    size := Vec2{1., 1.}*CELL_SZ*t
+    size := Vec2{1., 1.}*CELL_SZ*factor
     fill_size := size * CELL_FILL_RATIO
     for r in 0..<rows {
         for c in 0..<cols {

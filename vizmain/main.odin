@@ -10,7 +10,7 @@ import "../utils"
 DL_Alloc_Proc :: #type proc "c" ()
 DL_Pre_Reload_Proc :: #type proc "c" () -> (rawptr, utils.Anims)
 DL_Post_Reload_Proc :: #type proc "c" (state: rawptr)
-DL_Update_Proc :: #type proc "c" (dt: f32)
+DL_Update_Proc :: #type proc "c" ()
 DL_Symbols :: struct {
     alloc: DL_Alloc_Proc,
     pre_reload: DL_Pre_Reload_Proc,
@@ -71,6 +71,8 @@ main :: proc() {
     render_tex := rl.LoadRenderTexture(SW(), SH())
     render_frames, render_duration := 0, -1
     ffmpeg: FFmpeg
+
+    skipped_frames := 0
     for !rl.WindowShouldClose() {
         if rl.IsKeyPressed(.R) {
             state, _ := sym.pre_reload()
@@ -101,15 +103,23 @@ main :: proc() {
         }
 
         if !rendering {
-            dt := 0.0 if paused else rl.GetFrameTime() * f32(t_mult)
             rl.BeginDrawing()
             defer rl.EndDrawing()
-            sym.update(dt)
 
             if paused {
                 rl.DrawRectangle(SW() - 65, 25, 10, 35, rl.WHITE)
                 rl.DrawRectangle(SW() - 42, 25, 10, 35, rl.WHITE)
+            } else if t_mult >= 1 {
+                for _ in 1..=t_mult do sym.update()
+            } else if t_mult <= -2 {
+                if skipped_frames == 0 {
+                    sym.update()
+                    skipped_frames = abs(t_mult)
+                } else {
+                    skipped_frames -= 1
+                }
             }
+
             if t_mult != 1 {
                 assert(t_mult != 0, "t_mult should not be zero.")
                 text := rl.TextFormat("%dx", t_mult)
@@ -128,7 +138,7 @@ main :: proc() {
             {
                 rl.BeginTextureMode(render_tex)
                 defer rl.EndTextureMode()
-                sym.update(1/60)
+                sym.update()
             }
 
             img := rl.LoadImageFromTexture(render_tex.texture)
